@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>জাতীয় বিশ্ববিদ্যালয় - কলেজ তথ্য</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --nu-blue: #004d99;
+            --nu-light: #f8f9fa;
+        }
+        body {
+            background: var(--nu-light);
+            font-family: 'Kalpurush', Arial, sans-serif;
+        }
+        .nu-header {
+            background: var(--nu-blue);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .nu-logo {
+            height: 80px;
+        }
+        .info-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin: 1.5rem 0;
+            padding: 2rem;
+        }
+        .data-label {
+            color: var(--nu-blue);
+            font-weight: 600;
+            min-width: 220px;
+        }
+        .section-title {
+            color: var(--nu-blue);
+            border-left: 4px solid var(--nu-blue);
+            padding-left: 1rem;
+            margin: 2rem 0 1.5rem;
+        }
+        .loading-spinner {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="nu-header py-3">
+        <div class="container d-flex align-items-center">
+            <img src="http://103.113.200.68/nu-app/assets/images/logo.png" 
+                 alt="জাতীয় বিশ্ববিদ্যালয় লোগো" 
+                 class="nu-logo">
+            <div>
+                <h1 class="text-white mb-0">জাতীয় বিশ্ববিদ্যালয়</h1>
+                <p class="text-white-50 mb-0">কলেজ তথ্য বাতায়ন</p>
+                <a href="dev.html" class="text-white">বিকাশকারীর তথ্য</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container my-4">
+        <!-- Search Section -->
+        <div class="info-card">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-8">
+                    <input type="number" 
+                           id="collegeCode"
+                           class="form-control form-control-lg"
+                           placeholder="কলেজ কোড লিখুন (যেমন: 5215)"
+                           min="1000"
+                           max="9999">
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-primary btn-lg w-100" 
+                            onclick="fetchCollegeInfo()">
+                        <span class="spinner-border spinner-border-sm loading-spinner d-none"></span>
+                        তথ্য দেখুন
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div id="result" class="d-none">
+            <!-- College Header -->
+            <div class="info-card text-center">
+                <div class="row align-items-center">
+                    <div class="col-md-3">
+                        <img id="collegeLogo" 
+                             src="" 
+                             alt="কলেজ লোগো"
+                             class="img-fluid rounded-circle shadow"
+                             style="max-width: 150px;">
+                    </div>
+                    <div class="col-md-9 text-md-start">
+                        <h1 id="collegeName" class="text-primary mb-1"></h1>
+                        <h5 id="collegeAddress" class="text-muted"></h5>
+                        <p class="text-muted mb-0">কোড: <span id="collegeCodeDisplay"></span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Information Sections -->
+            <div class="row">
+                <!-- Left Column -->
+                <div class="col-md-6">
+                    <!-- Basic Information -->
+                    <div class="info-card">
+                        <h3 class="section-title">মৌলিক তথ্য</h3>
+                        <div class="table-responsive">
+                            <table class="table table-borderless">
+                                <tbody id="basicInfo"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Academic Info -->
+                    <div class="info-card">
+                        <h3 class="section-title">একাডেমিক তথ্য</h3>
+                        <div class="table-responsive">
+                            <table class="table table-borderless">
+                                <tbody id="academicInfo"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="col-md-6">
+                    <!-- Administration -->
+                    <div class="info-card">
+                        <h3 class="section-title">প্রশাসন</h3>
+                        <div class="table-responsive">
+                            <table class="table table-borderless">
+                                <tbody id="administration"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Library Info -->
+                    <div class="info-card">
+                        <h3 class="section-title">গ্রন্থাগার তথ্য</h3>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th>গ্রন্থাগার</th>
+                                        <th>বই</th>
+                                        <th>জার্নাল</th>
+                                        <th>সাময়িকী</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="libraryInfo"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historical Background -->
+            <div class="info-card">
+                <h3 class="section-title">ইতিহাস ও পটভূমি</h3>
+                <p id="backgroundInfo" class="lead text-muted"></p>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const PROXY_SERVERS = [
+        "https://corsproxy.io/?", // নতুন প্রোক্সি ১
+    "https://api.allorigins.win/raw?url=", // নতুন প্রোক্সি ২
+    "https://thingproxy.freeboard.io/fetch/" // নতুন প্রোক্সি ৩
+        ];
+
+        async function fetchCollegeInfo() {
+            const code = $('#collegeCode').val().trim();
+            if(!/^\d{4}$/.test(code)) {
+                alert("দয়া করে ৪ ডিজিটের সঠিক কলেজ কোড লিখুন");
+                return;
+            }
+
+            try {
+                $('.loading-spinner').removeClass('d-none');
+                let response;
+
+                // Try multiple proxies
+                for(const proxy of PROXY_SERVERS) {
+                    try {
+                        const url = `${proxy}${encodeURIComponent(`http://103.113.200.68/nu-app/college/profile/${code}`)}`;
+                        response = await fetch(url, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+                        if(response.ok) break;
+                    } catch(e) { console.error(`Proxy ${proxy} failed: ${e}`); }
+                }
+
+                if(!response?.ok) throw new Error("ডেটা লোড করতে ব্যর্থ");
+
+                const html = await response.text();
+                const data = parseCollegeData(html, code);
+                updateUI(data);
+                $('#result').removeClass('d-none');
+
+            } catch(error) {
+                alert(`ত্রুটি: ${error.message}`);
+            } finally {
+                $('.loading-spinner').addClass('d-none');
+            }
+        }
+
+        function parseCollegeData(html, code) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            // Validate response
+            if(!doc.querySelector('h1')) throw new Error("অবৈধ কলেজ কোড");
+
+            // Helper function to extract data
+            const getValue = (label) => {
+                const cells = Array.from(doc.querySelectorAll('td'));
+                const index = cells.findIndex(td => td.textContent.trim() === label);
+                return index !== -1 ? cells[index + 1].textContent.trim() : 'N/A';
+            };
+
+            // Extract library data from 3rd table
+            const libraryData = [];
+            const tables = doc.querySelectorAll('table.da-table.checkable');
+            if(tables.length >= 3) {
+                const libraryTable = tables[2];
+                const rows = libraryTable.querySelectorAll('tr');
+                rows.forEach((row, index) => {
+                    if(index === 0) return; // Skip header
+                    const cells = row.querySelectorAll('td, th');
+                    if(cells.length === 4) {
+                        libraryData.push({
+                            name: cells[0].textContent.trim(),
+                            books: cells[1].textContent.trim(),
+                            journals: cells[2].textContent.trim(),
+                            periodicals: cells[3].textContent.trim()
+                        });
+                    }
+                });
+            }
+
+            return {
+                name: doc.querySelector('h1').textContent.split('-')[0].trim(),
+                code: code,
+                logo: doc.querySelector('img[alt=""]')?.src || '',
+                address: doc.querySelector('h4').textContent.trim(),
+                basicInfo: {
+                    type: getValue('College Type'),
+                    established: getValue('Year of Establishment'),
+                    website: getValue('College Website'),
+                    email: getValue('College Email'),
+                    land: getValue('Total Land')
+                },
+                academicInfo: {
+                    intermediate: getValue('Intermediate affiliation'),
+                    degree: getValue('Degree affiliation'),
+                    honours: getValue('Honours affiliation'),
+                    hsc: getValue('HSC Exam Centre')
+                },
+                administration: {
+                    principal: getValue('Principal Name'),
+                    principalContact: getValue('Principal Mobile Number'),
+                    vicePrincipal: getValue('Vice Principal Name'),
+                    headClerk: getValue('Head Clerk name')
+                },
+                libraryData: libraryData,
+                background: doc.querySelector('td[colspan="2"] p')?.textContent.trim() || ''
+            };
+        }
+
+        function updateUI(data) {
+            // College Header
+            $('#collegeName').text(data.name);
+            $('#collegeCodeDisplay').text(data.code);
+            $('#collegeAddress').text(data.address);
+            $('#collegeLogo').attr('src', data.logo);
+
+            // Basic Info
+            $('#basicInfo').html(`
+                <tr><td class="data-label">ধরণ:</td><td>${data.basicInfo.type}</td></tr>
+                <tr><td class="data-label">স্থাপিত সাল:</td><td>${data.basicInfo.established}</td></tr>
+                <tr><td class="data-label">ওয়েবসাইট:</td><td>${data.basicInfo.website}</td></tr>
+                <tr><td class="data-label">ইমেইল:</td><td>${data.basicInfo.email}</td></tr>
+                <tr><td class="data-label">জমির পরিমাণ:</td><td>${data.basicInfo.land}</td></tr>
+            `);
+
+            // Academic Info
+            $('#academicInfo').html(`
+                <tr><td class="data-label">ইন্টারমিডিয়েট স্বীকৃতি:</td><td>${data.academicInfo.intermediate}</td></tr>
+                <tr><td class="data-label">ডিগ্রী স্বীকৃতি:</td><td>${data.academicInfo.degree}</td></tr>
+                <tr><td class="data-label">অনার্স স্বীকৃতি:</td><td>${data.academicInfo.honours}</td></tr>
+                <tr><td class="data-label">এইচএসসি কেন্দ্র:</td><td>${data.academicInfo.hsc}</td></tr>
+            `);
+
+            // Administration
+            $('#administration').html(`
+                <tr><td class="data-label">অধ্যক্ষ:</td><td>${data.administration.principal}</td></tr>
+                <tr><td class="data-label">যোগাযোগ:</td><td>${data.administration.principalContact}</td></tr>
+                <tr><td class="data-label">উপ-অধ্যক্ষ:</td><td>${data.administration.vicePrincipal}</td></tr>
+                <tr><td class="data-label">হেড ক্লার্ক:</td><td>${data.administration.headClerk}</td></tr>
+            `);
+
+            // Library Info
+            $('#libraryInfo').html(
+                data.libraryData.map(lib => `
+                    <tr>
+                        <td>${lib.name}</td>
+                        <td>${lib.books}</td>
+                        <td>${lib.journals}</td>
+                        <td>${lib.periodicals}</td>
+                    </tr>
+                `).join('')
+            );
+
+            // Background
+            $('#backgroundInfo').text(data.background);
+        }
+
+        // Input Validation
+        $('#collegeCode').on('input', function() {
+            this.value = this.value.replace(/\D/g,'').slice(0,4);
+        });
+    </script>
+</body>
+</html>
